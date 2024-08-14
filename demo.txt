@@ -1,0 +1,43 @@
+[33mRunning in parallel mode...[0m
+File: assets/image_1.png, Summary: Total Colors: 66895
+Most Frequent: #fcf2d9, Occurrences: 7747
+Least Frequent: #6d98aa, Occurrences: 1
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #57687f, Occurrences: 15204
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #dfc9bb, Occurrences: 15332
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #6a8f99, Occurrences: 14924
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #414369, Occurrences: 8947
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #9ebbb5, Occurrences: 12488
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #bba7a3, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #b5c8bc, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #eddbc9, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #3d4664, Occurrences: 8361
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #4c5b7c, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #5a7989, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #668f9c, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #82989f, Occurrences: 8362
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #86929a, Occurrences: 13379
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #85929a, Occurrences: 13379
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #859199, Occurrences: 13379
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #84919a, Occurrences: 13379
+All quantizer results have been written to colors.txt
+[33mRunning in parallel mode...[0m
+File: assets/image_1.png, Summary: Total Colors: 66895
+Most Frequent: #fcf2d9, Occurrences: 7747
+Least Frequent: #3b376f, Occurrences: 1
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #58697f, Occurrences: 15270
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #42436a, Occurrences: 9368
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #9fbcb5, Occurrences: 12323
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #6b9099, Occurrences: 14667
+File: assets/image_1.png, Quantizer: KMeansQuantizer, Color: #dfc9bb, Occurrences: 15267
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #5a7989, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #668f9c, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #82989f, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #bba7a3, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #b5c8bc, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #eddbc9, Occurrences: 8362
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #3d4664, Occurrences: 8361
+File: assets/image_1.png, Quantizer: MedianCutQuantizer, Color: #4c5b7c, Occurrences: 8362
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #86929a, Occurrences: 13379
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #859199, Occurrences: 13379
+File: assets/image_1.png, Quantizer: AverageQuantizer, Color: #85919a, Occurrences: 13379
+All quantizer results have been written to colors.txt

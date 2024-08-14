@@ -14,6 +14,7 @@ var quantizerType string
 var fast bool
 var all bool
 var rawOutput bool
+var includeFullColorExtract bool
 
 var rootCmd = &cobra.Command{
 	Use:   "colorsage [files...]",
@@ -76,6 +77,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&fast, "fast", "f", false, "Run only the fastest quantizer (default: KMeansQuantizer). This flag overrides running all quantizers.")
 	rootCmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "Run all available quantizers (KMeans, MedianCut, Average).")
 	rootCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Output raw results without UI elements, suitable for piping or redirection.")
+	rootCmd.PersistentFlags().BoolVar(&includeFullColorExtract, "full-color-extract", false, "Include full color extraction details in the output.")
 }
 
 // getQuantizerByName returns the quantizer instance based on the provided name
