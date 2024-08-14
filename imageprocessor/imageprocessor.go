@@ -1,3 +1,4 @@
+// imageprocessor/imageprocessor.go
 package imageprocessor
 
 import (

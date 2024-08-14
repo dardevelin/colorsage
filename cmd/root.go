@@ -1,20 +1,15 @@
+// cmd/root.go
 package cmd
 
 import (
+	"colorsage/cmd/output"
+	"colorsage/config"
 	"colorsage/imageprocessor"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 )
-
-var filePaths []string
-var sequential bool
-var quantizerType string
-var fast bool
-var all bool
-var rawOutput bool
-var includeFullColorExtract bool
 
 var rootCmd = &cobra.Command{
 	Use:   "colorsage [files...]",
@@ -27,7 +22,7 @@ You can use the --all flag to run all available quantizers (KMeans, MedianCut, a
 or specify a particular quantizer using the --quantizer flag.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		filePaths = args // Capture the file paths from command-line arguments
+		config.FilePaths = args // Capture the file paths from command-line arguments
 
 		processors := []imageprocessor.ImageProcessor{
 			&imageprocessor.ColorExtractor{},
@@ -36,31 +31,47 @@ or specify a particular quantizer using the --quantizer flag.`,
 		var quantizers []imageprocessor.Quantizer
 
 		// Determine which quantizers to run based on the command-line arguments
-		if all {
+		if config.All {
 			quantizers = append(quantizers, imageprocessor.KMeansQuantizer{})
 			quantizers = append(quantizers, imageprocessor.MedianCutQuantizer{})
 			quantizers = append(quantizers, imageprocessor.AverageQuantizer{})
-		} else if quantizerType != "" {
+		} else if config.QuantizerType != "" {
 			// Run only the specified quantizer
-			quantizer, err := getQuantizerByName(quantizerType)
+			quantizer, err := getQuantizerByName(config.QuantizerType)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 			quantizers = append(quantizers, quantizer)
+		} else if config.Fast {
+			// Run only the fastest quantizer if --fast is specified
+			quantizers = append(quantizers, imageprocessor.KMeansQuantizer{})
 		} else {
-			// Run only the fastest quantizer if neither --all nor --quantizer are specified
+			// Run only the fastest quantizer if neither --all nor --quantizer nor --fast are specified
 			quantizers = append(quantizers, imageprocessor.KMeansQuantizer{})
 		}
 
 		// Process the images using the selected quantizers
-		results := imageprocessor.ProcessPipeline(filePaths, processors, quantizers, sequential)
+		results := imageprocessor.ProcessPipeline(config.FilePaths, processors, quantizers, config.Sequential)
+
+		// Generate palette images if the flag is set
+		if config.GeneratePaletteImagesInCurrentDir {
+			for _, result := range results {
+				for quantizerName, palette := range result.Results {
+					filePath := output.GeneratePaletteFilename(result.FilePath, quantizerName)
+					err := output.GeneratePaletteImage(palette, filePath)
+					if err != nil {
+						fmt.Printf("Error generating palette image for %s: %v\n", result.FilePath, err)
+					}
+				}
+			}
+		}
 
 		// Display results in a table format
-		DisplayResultsTable(results)
+		output.DisplayResults(results)
 
 		// Write all quantizer outputs to a file
-		WriteResultsToFile("colors.txt", results)
+		output.WriteResultsToFile("colors.txt", results)
 	},
 }
 
@@ -72,12 +83,13 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&sequential, "sequential", "s", false, "Run the image processing pipeline sequentially (default: parallel)")
-	rootCmd.PersistentFlags().StringVarP(&quantizerType, "quantizer", "q", "", "Specify which quantizer to use (kmeans, mediancut, average). If not specified, the fastest quantizer is used.")
-	rootCmd.PersistentFlags().BoolVarP(&fast, "fast", "f", false, "Run only the fastest quantizer (default: KMeansQuantizer). This flag overrides running all quantizers.")
-	rootCmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "Run all available quantizers (KMeans, MedianCut, Average).")
-	rootCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Output raw results without UI elements, suitable for piping or redirection.")
-	rootCmd.PersistentFlags().BoolVar(&includeFullColorExtract, "full-color-extract", false, "Include full color extraction details in the output.")
+	rootCmd.PersistentFlags().BoolVarP(&config.Sequential, "sequential", "s", false, "Run the image processing pipeline sequentially (default: parallel)")
+	rootCmd.PersistentFlags().StringVarP(&config.QuantizerType, "quantizer", "q", "", "Specify which quantizer to use (kmeans, mediancut, average). If not specified, the fastest quantizer is used.")
+	rootCmd.PersistentFlags().BoolVar(&config.Fast, "fast", false, "Run only the fastest quantizer (default: KMeansQuantizer). This flag overrides running all quantizers.")
+	rootCmd.PersistentFlags().BoolVar(&config.All, "all", false, "Run all available quantizers (KMeans, MedianCut, Average).")
+	rootCmd.PersistentFlags().BoolVar(&config.RawOutput, "raw", false, "Output raw results without UI elements, suitable for piping or redirection.")
+	rootCmd.PersistentFlags().BoolVar(&config.IncludeFullColorExtract, "full", false, "Include full color extraction details in the output.")
+	rootCmd.PersistentFlags().BoolVar(&config.GeneratePaletteImagesInCurrentDir, "generate-palette-images-in-current-dir", false, "Generate palette images in the current directory instead of alongside the image files.")
 }
 
 // getQuantizerByName returns the quantizer instance based on the provided name
