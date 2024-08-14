@@ -3,9 +3,15 @@ package cmd
 import (
 	"colorsage/imageprocessor"
 	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -18,7 +24,7 @@ func DisplayResultsTable(results []imageprocessor.ImageResult) {
 	}
 }
 
-// displayPrettyResults shows results in a nice table format with colors
+// displayPrettyResults shows results in a nice table format with colors and generates palette images
 func displayPrettyResults(results []imageprocessor.ImageResult) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"File", "Quantizer", "Color", "Occurrences"})
@@ -44,11 +50,20 @@ func displayPrettyResults(results []imageprocessor.ImageResult) {
 			}
 		}
 
-		// Print the results for each quantizer
+		// Print the results for each quantizer and generate the palette image
 		for _, quantizerName := range []string{"KMeansQuantizer", "MedianCutQuantizer", "AverageQuantizer"} {
 			if palette, ok := result.Results[quantizerName]; ok {
 				for hex, count := range palette {
 					table.Append([]string{"", quantizerName, fmt.Sprintf(BackgroundColor(hex)+"%s"+Reset, hex), fmt.Sprintf("%d", count)})
+				}
+
+				// Generate an image for the palette
+				imageFilename := generatePaletteFilename(result.FilePath, quantizerName)
+				err := GeneratePaletteImage(palette, imageFilename)
+				if err != nil {
+					fmt.Printf(Red+"❌ Error generating palette image: %v"+Reset+"\n", err)
+				} else {
+					fmt.Printf(Cyan+"Image saved as: %s"+Reset+"\n", imageFilename)
 				}
 			}
 		}
@@ -221,4 +236,49 @@ type ColorSummary struct {
 	MostFrequentCount  int
 	LeastFrequentColor string
 	LeastFrequentCount int
+}
+
+// GeneratePaletteImage generates an image showing the color palette
+func GeneratePaletteImage(colors map[string]int, filename string) error {
+	const blockWidth, blockHeight = 50, 50
+	imgWidth := len(colors) * blockWidth
+	imgHeight := blockHeight
+
+	img := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+	draw.Draw(img, img.Bounds(), &image.Uniform{C: color.White}, image.Point{}, draw.Src)
+
+	i := 0
+	for hex := range colors {
+		c, err := colorful.Hex(hex)
+		if err != nil {
+			return err
+		}
+		draw.Draw(img, image.Rect(i*blockWidth, 0, (i+1)*blockWidth, blockHeight), &image.Uniform{C: color.RGBA{uint8(c.R * 255), uint8(c.G * 255), uint8(c.B * 255), 255}}, image.Point{}, draw.Src)
+		i++
+	}
+
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return png.Encode(file, img)
+}
+
+// generatePaletteFilename creates a filename for the palette image based on the file and quantizer
+func generatePaletteFilename(filePath, quantizerName string) string {
+	baseName := filepath.Base(filePath)
+	ext := filepath.Ext(baseName)
+	nameWithoutExt := strings.TrimSuffix(baseName, ext)
+	return fmt.Sprintf("%s_%s_palette.png", nameWithoutExt, quantizerName)
+}
+
+// displayColorBlocks prints the color blocks in the terminal
+func displayColorBlocks(colors map[string]int) {
+	for hex := range colors {
+		// Print a color block using ANSI background color codes
+		fmt.Printf(BackgroundColor(hex) + "     " + Reset)
+	}
+	fmt.Println()
 }
