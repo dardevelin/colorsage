@@ -39,3 +39,5 @@ colors.txt
 # Ignore a debugging file directory_tree_and_go_files.txt
 directory_tree_and_go_files.txt
 
+# ignore macos .DS_Store files
+.DS_Store
