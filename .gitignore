@@ -1,0 +1,31 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Logs
+*.log
+
+# Dependency directories (vendor/)
+vendor/
+
+# Go test binary files
+*.test
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+
+# Go module files
+go.sum
+
+# Executable files
+colorsage
+
+# Ignore asset folders
+assets/
