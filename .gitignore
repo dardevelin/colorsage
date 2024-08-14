@@ -29,3 +29,13 @@ colorsage
 
 # Ignore asset folders
 assets/
+
+# ignore debugging script tk.sh
+tk.sh
+
+# Ignore a debugging file colors.txt
+colors.txt
+
+# Ignore a debugging file directory_tree_and_go_files.txt
+directory_tree_and_go_files.txt
+
