@@ -1,6 +1,7 @@
 package imageprocessor
 
+// Quantizer interface for quantizing color palettes
 type Quantizer interface {
 	Name() string
-	Quantize(colorMap map[string]int, numColors int) map[string]int
+	Quantize(colors map[string]int, numColors int) (map[string]int, error)
 }

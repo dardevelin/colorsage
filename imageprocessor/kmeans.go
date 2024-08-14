@@ -13,7 +13,7 @@ func (q KMeansQuantizer) Name() string {
 	return "KMeansQuantizer"
 }
 
-func (q KMeansQuantizer) Quantize(colorMap map[string]int, numColors int) map[string]int {
+func (q KMeansQuantizer) Quantize(colorMap map[string]int, numColors int) (map[string]int, error) {
 	colors := q.extractColors(colorMap)
 	clusters := q.kmeans(colors, numColors)
 
@@ -23,7 +23,7 @@ func (q KMeansQuantizer) Quantize(colorMap map[string]int, numColors int) map[st
 		quantizedPalette[centroid.Hex()] = len(cluster)
 	}
 
-	return quantizedPalette
+	return quantizedPalette, nil
 }
 
 func (q KMeansQuantizer) extractColors(colorMap map[string]int) []colorful.Color {

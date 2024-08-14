@@ -4,7 +4,6 @@ import (
 	"colorsage/imageprocessor"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -14,6 +13,7 @@ var sequential bool
 var quantizerType string
 var fast bool
 var all bool
+var rawOutput bool
 
 var rootCmd = &cobra.Command{
 	Use:   "colorsage [files...]",
@@ -52,17 +52,14 @@ or specify a particular quantizer using the --quantizer flag.`,
 			quantizers = append(quantizers, imageprocessor.KMeansQuantizer{})
 		}
 
-		var allResults []string
-
 		// Process the images using the selected quantizers
-		for _, quantizer := range quantizers {
-			results := imageprocessor.ProcessPipeline(filePaths, processors, quantizer, sequential)
-			PrintResults(results)
-			allResults = append(allResults, formatResultsForFile(results, quantizer.Name()))
-		}
+		results := imageprocessor.ProcessPipeline(filePaths, processors, quantizers, sequential)
 
-		// Write all quantizer outputs to a file with color
-		writeResultsToFile("colors.txt", allResults)
+		// Display results in a table format
+		DisplayResultsTable(results)
+
+		// Write all quantizer outputs to a file
+		WriteResultsToFile("colors.txt", results)
 	},
 }
 
@@ -78,6 +75,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&quantizerType, "quantizer", "q", "", "Specify which quantizer to use (kmeans, mediancut, average). If not specified, the fastest quantizer is used.")
 	rootCmd.PersistentFlags().BoolVarP(&fast, "fast", "f", false, "Run only the fastest quantizer (default: KMeansQuantizer). This flag overrides running all quantizers.")
 	rootCmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "Run all available quantizers (KMeans, MedianCut, Average).")
+	rootCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Output raw results without UI elements, suitable for piping or redirection.")
 }
 
 // getQuantizerByName returns the quantizer instance based on the provided name
@@ -92,44 +90,4 @@ func getQuantizerByName(name string) (imageprocessor.Quantizer, error) {
 	default:
 		return nil, fmt.Errorf("invalid quantizer type: %s. Supported types: kmeans, mediancut, average", name)
 	}
-}
-
-// formatResultsForFile formats the results of processing for writing to a file with color
-func formatResultsForFile(results []imageprocessor.ImageResult, quantizerName string) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf(Purple+"Results for Quantizer: %s"+Reset+"\n", quantizerName))
-	for _, result := range results {
-		if result.Err != nil {
-			sb.WriteString(fmt.Sprintf(Red+"❌ Error processing file %s: %v"+Reset+"\n", result.FilePath, result.Err))
-			continue
-		}
-		sb.WriteString(fmt.Sprintf(Green+"✅ Results for %s:"+Reset+"\n", result.FilePath))
-		for processorName, palette := range result.Results {
-			if processorName == quantizerName {
-				sb.WriteString(fmt.Sprintf(Cyan+"  Quantized Palette (%s):"+Reset+"\n", quantizerName))
-				for hex, count := range palette {
-					sb.WriteString(fmt.Sprintf("    - Color "+BackgroundColor(hex)+"%s"+Reset+": %d occurrences\n", hex, count))
-				}
-			}
-		}
-		sb.WriteString("\n")
-	}
-	return sb.String()
-}
-
-// writeResultsToFile writes all quantizer results to the specified file with color
-func writeResultsToFile(filename string, results []string) {
-	file, err := os.Create(filename)
-	if err != nil {
-		fmt.Println(Red+"❌ Error creating results file:"+Reset, err)
-		return
-	}
-	defer file.Close()
-
-	for _, result := range results {
-		file.WriteString(result)
-		file.WriteString("\n")
-	}
-
-	fmt.Println(Green+"✅ All quantizer results have been written to", filename+Reset)
 }

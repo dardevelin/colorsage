@@ -12,10 +12,10 @@ func (q MedianCutQuantizer) Name() string {
 	return "MedianCutQuantizer"
 }
 
-func (q MedianCutQuantizer) Quantize(colorMap map[string]int, numColors int) map[string]int {
+func (q MedianCutQuantizer) Quantize(colorMap map[string]int, numColors int) (map[string]int, error) {
 	colors := q.extractColors(colorMap)
 	if len(colors) == 0 {
-		return map[string]int{}
+		return map[string]int{}, nil
 	}
 
 	initialBox := colorBox{colors: colors}
@@ -27,7 +27,7 @@ func (q MedianCutQuantizer) Quantize(colorMap map[string]int, numColors int) map
 		quantizedPalette[centroid.Hex()] = len(box.colors)
 	}
 
-	return quantizedPalette
+	return quantizedPalette, nil
 }
 
 type colorBox struct {

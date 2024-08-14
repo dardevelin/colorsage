@@ -10,7 +10,7 @@ func (q AverageQuantizer) Name() string {
 	return "AverageQuantizer"
 }
 
-func (q AverageQuantizer) Quantize(colorMap map[string]int, numColors int) map[string]int {
+func (q AverageQuantizer) Quantize(colorMap map[string]int, numColors int) (map[string]int, error) {
 	colors := q.extractColors(colorMap)
 	return q.simpleAverage(colors, numColors)
 }
@@ -26,9 +26,9 @@ func (q AverageQuantizer) extractColors(colorMap map[string]int) []colorful.Colo
 	return colors
 }
 
-func (q AverageQuantizer) simpleAverage(colors []colorful.Color, numColors int) map[string]int {
+func (q AverageQuantizer) simpleAverage(colors []colorful.Color, numColors int) (map[string]int, error) {
 	if len(colors) == 0 {
-		return map[string]int{}
+		return map[string]int{}, nil
 	}
 
 	// Divide the colors into equal-sized buckets and average each bucket
@@ -49,7 +49,7 @@ func (q AverageQuantizer) simpleAverage(colors []colorful.Color, numColors int) 
 		quantizedPalette[centroid.Hex()] = len(bucket)
 	}
 
-	return quantizedPalette
+	return quantizedPalette, nil
 }
 
 func (q AverageQuantizer) bucketCentroid(bucket []colorful.Color) colorful.Color {
